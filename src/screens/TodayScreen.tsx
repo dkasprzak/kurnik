@@ -1,6 +1,6 @@
 import type { DateKey, DayEntry, Flock } from '../domain';
 import { DayCards, type DayCardsHandlers } from '../components/DayCards';
-import { describeFlock, formatLongDate } from '../polish';
+import { describeFlock, formatLongDate } from '../plText';
 
 type Props = DayCardsHandlers & {
   today: DateKey;

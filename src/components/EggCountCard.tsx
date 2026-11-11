@@ -1,5 +1,5 @@
 import { expectedEggs, rateEggCount, type DateKey, type Flock } from '../domain';
-import { EGG_RATING_LABELS, formatDecimal } from '../polish';
+import { EGG_RATING_LABELS, formatDecimal } from '../plText';
 import { Stepper } from './Stepper';
 
 type Props = {

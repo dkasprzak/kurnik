@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { isAllIn, shortfallOf, type Closing, type Flock } from '../domain';
-import { describeMissingHens, describeMissingRoosters } from '../polish';
+import { hasShortfall, shortfallOf, type Closing, type Flock } from '../domain';
+import { describeShortfall } from '../plText';
 import { Stepper } from './Stepper';
 
 type Props = {
@@ -89,13 +89,14 @@ function ClosingResult({ flock, closing, onEdit }: ResultProps) {
 
   return (
     <div className="closing-result">
-      {isAllIn(shortfall) ? (
-        <p className="closing-all-in">Wszystkie ptaki w kurniku</p>
-      ) : (
+      {hasShortfall(shortfall) ? (
         <div className="closing-shortfall" role="alert">
-          {shortfall.hens > 0 && <p>{describeMissingHens(shortfall.hens)}</p>}
-          {shortfall.roosters > 0 && <p>{describeMissingRoosters(shortfall.roosters)}</p>}
+          {describeShortfall(shortfall).map((line) => (
+            <p key={line}>{line}</p>
+          ))}
         </div>
+      ) : (
+        <p className="closing-all-in">Wszystkie ptaki w kurniku</p>
       )}
       <button type="button" className="button-secondary" onClick={onEdit}>
         Popraw

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Flock } from '../domain';
 import { FlockForm } from '../components/FlockForm';
-import { describeFlock } from '../polish';
+import { describeFlock } from '../plText';
 
 type Props = {
   flock: Flock;

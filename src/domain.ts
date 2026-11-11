@@ -2,16 +2,17 @@
  * Pure domain module (no React). Vocabulary follows GLOSSARY.md.
  */
 
-export type Flock = {
+/** A number of birds per bird type. */
+export type BirdCounts = {
   hens: number;
   roosters: number;
 };
 
+/** The birds the keeper owns. */
+export type Flock = BirdCounts;
+
 /** Birds counted in the coop at the evening Closing. */
-export type Closing = {
-  hens: number;
-  roosters: number;
-};
+export type Closing = BirdCounts;
 
 /** Local calendar date as YYYY-MM-DD. */
 export type DateKey = string;
@@ -88,10 +89,7 @@ export function saveClosing(state: AppState, date: DateKey, closing: Closing): A
 }
 
 /** Birds missing at Closing, per bird type. */
-export type Shortfall = {
-  hens: number;
-  roosters: number;
-};
+export type Shortfall = BirdCounts;
 
 /** max(0, flock − counted) per bird type. */
 export function shortfallOf(flock: Flock, closing: Closing): Shortfall {
@@ -101,9 +99,9 @@ export function shortfallOf(flock: Flock, closing: Closing): Shortfall {
   };
 }
 
-/** True when no bird is missing ("all in"). */
-export function isAllIn(shortfall: Shortfall): boolean {
-  return shortfall.hens === 0 && shortfall.roosters === 0;
+/** True when at least one bird was not counted at Closing (otherwise "all in"). */
+export function hasShortfall(shortfall: Shortfall): boolean {
+  return shortfall.hens > 0 || shortfall.roosters > 0;
 }
 
 /** Laying Rate per month, January first (fixed, not configurable). */
@@ -127,7 +125,7 @@ export type EggRating = 'poor' | 'normal' | 'great';
  */
 export function rateEggCount(eggCount: number, flock: Flock, date: DateKey): EggRating | undefined {
   const expected = expectedEggs(flock, date);
-  if (flock.hens === 0 || expected === 0) return undefined;
+  if (expected === 0) return undefined;
   const ratio = eggCount / expected;
   if (ratio < 0.6) return 'poor';
   if (ratio > 1.2) return 'great';
@@ -171,7 +169,7 @@ export function summarizeDays(dayEntries: AppState['dayEntries'], today: DateKey
       totalEggs += entry.eggCount;
       daysWithEggCount += 1;
     }
-    if (entry.closing && !isAllIn(shortfallOf(entry.flock, entry.closing))) shortfallDays += 1;
+    if (entry.closing && hasShortfall(shortfallOf(entry.flock, entry.closing))) shortfallDays += 1;
   }
   return {
     totalEggs,

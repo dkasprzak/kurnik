@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  isAllIn,
+  hasShortfall,
   rateEggCount,
   shortfallOf,
   summarizeDays,
@@ -9,11 +9,7 @@ import {
   type DayEntry,
   type DaysSummary,
 } from '../domain';
-import { EGG_RATING_LABELS, describeMissingHens, describeMissingRoosters, formatLongDate } from '../polish';
-
-/** Always one decimal, e.g. "2,0". */
-const formatAverage = (value: number) =>
-  new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(value);
+import { EGG_RATING_LABELS, describeShortfall, formatAverageEggs, formatLongDate } from '../plText';
 
 /** Total eggs, average per day and Shortfall day count for one window of recent days. */
 function SummaryCard({ title, summary }: { title: string; summary: DaysSummary }) {
@@ -27,7 +23,7 @@ function SummaryCard({ title, summary }: { title: string; summary: DaysSummary }
         <dt>Jajka razem</dt>
         <dd>{summary.totalEggs}</dd>
         <dt>Średnio dziennie</dt>
-        <dd>{formatAverage(summary.averageEggs)}</dd>
+        <dd>{formatAverageEggs(summary.averageEggs)}</dd>
         <dt>Dni z brakami</dt>
         <dd>{summary.shortfallDays}</dd>
       </dl>
@@ -121,9 +117,6 @@ function describeEggs(date: DateKey, entry: DayEntry): string {
 function describeClosing(entry: DayEntry): string {
   if (!entry.closing) return 'Nie zamknięto';
   const shortfall = shortfallOf(entry.flock, entry.closing);
-  if (isAllIn(shortfall)) return 'Wszystkie ptaki w kurniku';
-  const parts: string[] = [];
-  if (shortfall.hens > 0) parts.push(describeMissingHens(shortfall.hens));
-  if (shortfall.roosters > 0) parts.push(describeMissingRoosters(shortfall.roosters));
-  return parts.join(', ');
+  if (!hasShortfall(shortfall)) return 'Wszystkie ptaki w kurniku';
+  return describeShortfall(shortfall).join(', ');
 }
