@@ -110,7 +110,7 @@ describe('Closing', () => {
     await first.user.click(closingCard().getByRole('button', { name: 'Zamknij kurnik' }));
     first.unmount();
 
-    renderApp({ today: '2026-11-11', storage: first.storage });
+    renderApp({ signedIn: true, today: '2026-11-11', storage: first.storage });
 
     expect(closingCard().getByRole('alert')).toHaveTextContent('Brakuje 1 kury');
   });

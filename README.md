@@ -8,8 +8,11 @@ Wymagany Node.js 24+.
 
 ```sh
 npm install
+cp .env.example .env.local   # uzupełnij konfigurację Firebase (konsola → Ustawienia projektu → Twoje aplikacje)
 npm run dev
 ```
+
+Logowanie odbywa się wspólnym kontem domowym (e-mail + hasło) założonym ręcznie w konsoli Firebase (Authentication).
 
 Inne polecenia:
 

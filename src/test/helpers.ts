@@ -21,7 +21,7 @@ export function storageWithFlock(flock: Flock, dayEntries: AppState['dayEntries'
 
 /** Opens the app on the Today screen with an already configured Flock. */
 export function renderToday(flock: Flock, today = '2026-11-11') {
-  return renderApp({ today, storage: storageWithFlock(flock) });
+  return renderApp({ signedIn: true, today, storage: storageWithFlock(flock) });
 }
 
 export const nav = () => within(screen.getByRole('navigation', { name: 'Nawigacja' }));

@@ -6,12 +6,13 @@ See `.scratch/kury-prototype/spec.md` (Amendment 1, stories 40–42) and `GLOSSA
 
 **Blocked by:** None for the code and tests (fake auth). Manual check on a phone needs 08 (Firebase project setup).
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] `<App>` accepts an injected auth adapter; the real one wraps Firebase Authentication, configured from `VITE_FIREBASE_*` env variables
-- [ ] The test render helper provides a fake auth (signed out by default, with a way to start signed in)
-- [ ] Signed out: only the sign-in screen is shown; signing in with correct credentials shows Flock setup or Today
-- [ ] Wrong credentials show a Polish error message and keep the Keeper on the sign-in screen
-- [ ] Session persists across remount (fake auth state survives; real adapter uses Firebase's local persistence)
-- [ ] "Wyloguj" in Settings signs out and shows the sign-in screen
-- [ ] The app still builds and runs when env variables are missing in tests (adapter is only created in the real entry point)
+- [x] `<App>` accepts an injected auth adapter; the real one wraps Firebase Authentication, configured from `VITE_FIREBASE_*` env variables
+- [x] The test render helper provides a fake auth (signed out by default, with a way to start signed in)
+- [x] Signed out: only the sign-in screen is shown; signing in with correct credentials shows Flock setup or Today
+- [x] Wrong credentials show a Polish error message and keep the Keeper on the sign-in screen
+- [x] Session persists across remount (fake auth state survives; real adapter uses Firebase's local persistence)
+- [x] "Wyloguj" in Settings signs out and shows the sign-in screen
+- [x] The app still builds and runs when env variables are missing in tests (adapter is only created in the real entry point)
+- [ ] Manual check (after 08): sign in with the Household Account on a phone, close and reopen the app (still signed in), then "Wyloguj"

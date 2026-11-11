@@ -19,7 +19,7 @@ describe('History', () => {
       '2026-11-10': { flock: { hens: 5, roosters: 1 }, eggCount: 2 },
       '2026-11-03': { flock: { hens: 5, roosters: 1 }, eggCount: 3 },
     });
-    const { user } = renderApp({ today: '2026-11-11', storage });
+    const { user } = renderApp({ signedIn: true, today: '2026-11-11', storage });
 
     await openHistory(user);
 
@@ -39,7 +39,7 @@ describe('History', () => {
       '2026-11-08': { flock: { hens: 5, roosters: 1 }, closing: { hens: 5, roosters: 0 } },
       '2026-11-07': { flock: { hens: 5, roosters: 1 }, eggCount: 0 },
     });
-    const { user } = renderApp({ today: '2026-11-11', storage });
+    const { user } = renderApp({ signedIn: true, today: '2026-11-11', storage });
 
     await openHistory(user);
 
@@ -58,7 +58,7 @@ describe('History', () => {
     const storage = seededStorage({
       '2026-11-09': { flock: { hens: 5, roosters: 1 }, eggCount: 1 },
     });
-    const { user } = renderApp({ today: '2026-11-11', storage });
+    const { user } = renderApp({ signedIn: true, today: '2026-11-11', storage });
     await openHistory(user);
 
     await user.click(within(dayList()).getByRole('button', { name: /poniedziałek, 9 listopada 2026/ }));
@@ -86,7 +86,7 @@ describe('History', () => {
       flock: { hens: 2, roosters: 0 },
       dayEntries: { '2026-05-20': { flock: { hens: 10, roosters: 1 }, eggCount: 7 } },
     });
-    const { user } = renderApp({ today: '2026-11-11', storage });
+    const { user } = renderApp({ signedIn: true, today: '2026-11-11', storage });
     await openHistory(user);
 
     // May: 10 hens × 0.80 = 8 Expected Eggs; 7 / 8 = 0.875 → normal
@@ -100,7 +100,7 @@ describe('History', () => {
 
   it('backfills a past day without an entry using a snapshot of the current Flock', async () => {
     const storage = seededStorage({});
-    const { user } = renderApp({ today: '2026-11-11', storage });
+    const { user } = renderApp({ signedIn: true, today: '2026-11-11', storage });
     await openHistory(user);
     expect(within(dayList()).queryAllByRole('listitem')).toHaveLength(0);
 
@@ -120,7 +120,7 @@ describe('History', () => {
 
   it('shows an empty past day with no Egg Count and no Egg Rating until "0 jaj" is recorded', async () => {
     const storage = seededStorage({});
-    const { user } = renderApp({ today: '2026-11-11', storage });
+    const { user } = renderApp({ signedIn: true, today: '2026-11-11', storage });
     await openHistory(user);
     await user.type(screen.getByLabelText('Wybierz dzień'), '2026-11-10');
     await user.click(screen.getByRole('button', { name: 'Otwórz dzień' }));
@@ -137,7 +137,7 @@ describe('History', () => {
 
   it('keeps a backfilled past day after the app is reopened', async () => {
     const storage = seededStorage({});
-    const first = renderApp({ today: '2026-11-11', storage });
+    const first = renderApp({ signedIn: true, today: '2026-11-11', storage });
     await openHistory(first.user);
     await first.user.type(screen.getByLabelText('Wybierz dzień'), '2026-11-10');
     await first.user.click(screen.getByRole('button', { name: 'Otwórz dzień' }));
@@ -146,7 +146,7 @@ describe('History', () => {
     await first.user.click(closingCard().getByRole('button', { name: 'Zamknij kurnik' }));
     first.unmount();
 
-    const { user } = renderApp({ today: '2026-11-11', storage });
+    const { user } = renderApp({ signedIn: true, today: '2026-11-11', storage });
     await openHistory(user);
     await user.click(within(dayList()).getByRole('button', { name: /wtorek, 10 listopada 2026/ }));
 
@@ -155,7 +155,7 @@ describe('History', () => {
   });
 
   it('does not allow a future date to be opened', async () => {
-    const { user } = renderApp({ today: '2026-11-11', storage: seededStorage({}) });
+    const { user } = renderApp({ signedIn: true, today: '2026-11-11', storage: seededStorage({}) });
     await openHistory(user);
     const picker = screen.getByLabelText('Wybierz dzień');
     expect(picker).toHaveAttribute('max', '2026-11-11');
@@ -189,7 +189,7 @@ describe('History summary', () => {
       // outside both windows
       '2026-10-12': { flock, eggCount: 9, closing: { hens: 0, roosters: 0 } },
     });
-    const { user } = renderApp({ today: '2026-11-11', storage });
+    const { user } = renderApp({ signedIn: true, today: '2026-11-11', storage });
 
     await openHistory(user);
 
@@ -209,7 +209,7 @@ describe('History summary', () => {
       '2026-11-10': { flock: { hens: 5, roosters: 1 } },
       '2026-09-01': { flock: { hens: 5, roosters: 1 }, eggCount: 4 },
     });
-    const { user } = renderApp({ today: '2026-11-11', storage });
+    const { user } = renderApp({ signedIn: true, today: '2026-11-11', storage });
 
     await openHistory(user);
 

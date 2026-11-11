@@ -6,9 +6,10 @@ import { describeFlock } from '../plText';
 type Props = {
   flock: Flock;
   onSaveFlock: (flock: Flock) => void;
+  onSignOut: () => void;
 };
 
-export function SettingsScreen({ flock, onSaveFlock }: Props) {
+export function SettingsScreen({ flock, onSaveFlock, onSignOut }: Props) {
   const [saved, setSaved] = useState(false);
   return (
     <main className="screen">
@@ -30,6 +31,12 @@ export function SettingsScreen({ flock, onSaveFlock }: Props) {
             Zapisano: {describeFlock(flock)}
           </p>
         )}
+      </section>
+      <section aria-label="Konto" className="settings-section">
+        <h2 className="card-title">Konto</h2>
+        <button type="button" className="button-secondary" onClick={onSignOut}>
+          Wyloguj
+        </button>
       </section>
     </main>
   );

@@ -12,7 +12,7 @@ async function openToday(user: User) {
 }
 
 function renderWith(storage: AppStorage, today = '2026-11-11') {
-  return renderApp({ today, storage });
+  return renderApp({ signedIn: true, today, storage });
 }
 
 describe('Settings', () => {

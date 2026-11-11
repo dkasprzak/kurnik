@@ -14,7 +14,7 @@ const rating = () => eggCard().queryByText(/^Ocena:/);
 
 describe('Egg Count', () => {
   it('shows no Egg Count and no Egg Rating before anything is recorded', async () => {
-    const { user, storage } = renderApp({ today: '2026-11-11' });
+    const { user, storage } = renderApp({ signedIn: true, today: '2026-11-11' });
     await submitFlockForm(user, { hens: 5, roosters: 1 });
 
     expect(eggCountValue()).toHaveTextContent('—');
@@ -25,7 +25,7 @@ describe('Egg Count', () => {
   });
 
   it('records 1 egg on the first tap of +', async () => {
-    const { user, storage } = renderApp({ today: '2026-11-11' });
+    const { user, storage } = renderApp({ signedIn: true, today: '2026-11-11' });
     await submitFlockForm(user, { hens: 5, roosters: 1 });
 
     await addEgg(user);
@@ -35,7 +35,7 @@ describe('Egg Count', () => {
   });
 
   it('records zero eggs explicitly, with an Egg Rating', async () => {
-    const { user, storage } = renderApp({ today: '2026-11-11' });
+    const { user, storage } = renderApp({ signedIn: true, today: '2026-11-11' });
     await submitFlockForm(user, { hens: 5, roosters: 1 });
 
     await recordZero(user);
@@ -48,7 +48,7 @@ describe('Egg Count', () => {
   });
 
   it('counts eggs with +/− buttons and never goes below zero', async () => {
-    const { user } = renderApp();
+    const { user } = renderApp({ signedIn: true });
     await submitFlockForm(user, { hens: 5, roosters: 1 });
 
     await addEggs(user, 3);
@@ -62,23 +62,23 @@ describe('Egg Count', () => {
   });
 
   it('keeps the Egg Count after reopening the app and lets it be changed again', async () => {
-    const first = renderApp({ today: '2026-11-11' });
+    const first = renderApp({ signedIn: true, today: '2026-11-11' });
     await submitFlockForm(first.user, { hens: 5, roosters: 1 });
     await addEggs(first.user, 2);
     first.unmount();
 
-    const second = renderApp({ today: '2026-11-11', storage: first.storage });
+    const second = renderApp({ signedIn: true, today: '2026-11-11', storage: first.storage });
     expect(eggCountValue()).toHaveTextContent('2');
 
     await addEgg(second.user);
     second.unmount();
 
-    renderApp({ today: '2026-11-11', storage: first.storage });
+    renderApp({ signedIn: true, today: '2026-11-11', storage: first.storage });
     expect(eggCountValue()).toHaveTextContent('3');
   });
 
   it("creates today's Day Entry with a snapshot of the Flock when eggs are first recorded", async () => {
-    const { user, storage } = renderApp({ today: '2026-11-11' });
+    const { user, storage } = renderApp({ signedIn: true, today: '2026-11-11' });
     await submitFlockForm(user, { hens: 5, roosters: 1 });
     expect(storage.load().dayEntries).toEqual({});
 
@@ -91,7 +91,7 @@ describe('Egg Count', () => {
   });
 
   it('rates the same Egg Count as great in November and poor in May', async () => {
-    const november = renderApp({ today: '2026-11-11' });
+    const november = renderApp({ signedIn: true, today: '2026-11-11' });
     await submitFlockForm(november.user, { hens: 5, roosters: 1 });
     await addEggs(november.user, 2);
     // 5 hens × 0.25 = 1.25 expected; 2 / 1.25 = 1.6
@@ -99,7 +99,7 @@ describe('Egg Count', () => {
     expect(eggCard().getByText('Ocena: świetnie')).toBeInTheDocument();
     november.unmount();
 
-    const may = renderApp({ today: '2026-05-11' });
+    const may = renderApp({ signedIn: true, today: '2026-05-11' });
     await submitFlockForm(may.user, { hens: 5, roosters: 1 });
     await addEggs(may.user, 2);
     // 5 hens × 0.80 = 4 expected; 2 / 4 = 0.5
@@ -109,7 +109,7 @@ describe('Egg Count', () => {
 
   it('rates exactly 60% and exactly 120% of Expected Eggs as normal', async () => {
     // 20 hens × 0.25 (November) = 5 expected
-    const { user } = renderApp({ today: '2026-11-11' });
+    const { user } = renderApp({ signedIn: true, today: '2026-11-11' });
     await submitFlockForm(user, { hens: 20, roosters: 0 });
     const rating = () => eggCard().getByText(/^Ocena:/);
 
@@ -124,7 +124,7 @@ describe('Egg Count', () => {
   });
 
   it('shows no Egg Rating when the Flock has no hens', async () => {
-    const { user } = renderApp({ today: '2026-05-11' });
+    const { user } = renderApp({ signedIn: true, today: '2026-05-11' });
     await submitFlockForm(user, { hens: 0, roosters: 2 });
     await addEgg(user);
 
@@ -133,12 +133,12 @@ describe('Egg Count', () => {
   });
 
   it('starts a new day with no Egg Count recorded', async () => {
-    const first = renderApp({ today: '2026-11-11' });
+    const first = renderApp({ signedIn: true, today: '2026-11-11' });
     await submitFlockForm(first.user, { hens: 5, roosters: 1 });
     await addEggs(first.user, 2);
     first.unmount();
 
-    renderApp({ today: '2026-11-12', storage: first.storage });
+    renderApp({ signedIn: true, today: '2026-11-12', storage: first.storage });
     expect(eggCountValue()).toHaveTextContent('—');
     expect(rating()).not.toBeInTheDocument();
   });

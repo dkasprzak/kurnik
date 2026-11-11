@@ -4,7 +4,7 @@ import { submitFlockForm } from './test/helpers';
 
 describe('Flock setup', () => {
   it('asks for the number of hens and roosters on first launch', () => {
-    renderApp();
+    renderApp({ signedIn: true });
 
     expect(screen.getByRole('heading', { name: /twoje stado/i })).toBeInTheDocument();
     expect(screen.getByLabelText('Kury')).toBeInTheDocument();
@@ -12,7 +12,7 @@ describe('Flock setup', () => {
   });
 
   it('shows the configured Flock on the Today screen after saving', async () => {
-    const { user } = renderApp();
+    const { user } = renderApp({ signedIn: true });
 
     await submitFlockForm(user, { hens: 5, roosters: 1 });
 
@@ -21,7 +21,7 @@ describe('Flock setup', () => {
   });
 
   it('accepts a Flock with no roosters', async () => {
-    const { user } = renderApp();
+    const { user } = renderApp({ signedIn: true });
 
     await submitFlockForm(user, { hens: 4, roosters: 0 });
 
@@ -29,7 +29,7 @@ describe('Flock setup', () => {
   });
 
   it('rejects a Flock with zero hens and zero roosters', async () => {
-    const { user } = renderApp();
+    const { user } = renderApp({ signedIn: true });
 
     await submitFlockForm(user, { hens: 0, roosters: 0 });
 
@@ -39,11 +39,11 @@ describe('Flock setup', () => {
   });
 
   it('skips setup on later launches and shows the saved Flock', async () => {
-    const first = renderApp();
+    const first = renderApp({ signedIn: true });
     await submitFlockForm(first.user, { hens: 3, roosters: 2 });
     first.unmount();
 
-    renderApp({ storage: first.storage });
+    renderApp({ signedIn: true, storage: first.storage });
 
     expect(screen.queryByRole('heading', { name: /twoje stado/i })).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Dziś' })).toBeInTheDocument();
@@ -53,7 +53,7 @@ describe('Flock setup', () => {
 
 describe('Today screen', () => {
   it("shows today's date from the clock", async () => {
-    const { user } = renderApp({ today: '2026-05-03' });
+    const { user } = renderApp({ signedIn: true, today: '2026-05-03' });
 
     await submitFlockForm(user, { hens: 5, roosters: 1 });
 
