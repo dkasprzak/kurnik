@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { systemClock, type Clock } from './clock';
-import { saveClosing, toDateKey, type AppState, type Flock } from './domain';
+import { saveClosing, saveEggCount, toDateKey, type AppState, type Flock } from './domain';
 import { createLocalStorage, type AppStorage } from './storage';
 import { FlockSetupScreen } from './screens/FlockSetupScreen';
 import { TodayScreen } from './screens/TodayScreen';
@@ -36,6 +36,7 @@ export function App({ clock = systemClock, storage = defaultStorage }: AppProps)
       flock={state.flock}
       dayEntry={state.dayEntries[today]}
       onSaveClosing={(closing) => update(saveClosing(state, today, closing))}
+      onEggCountChange={(eggCount) => update(saveEggCount(state, today, eggCount))}
     />
   );
 }

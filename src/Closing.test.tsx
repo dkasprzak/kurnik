@@ -126,6 +126,24 @@ describe('Closing', () => {
     expect(closingCard().getByRole('alert')).toHaveTextContent('Brakuje 1 kury');
   });
 
+  it('bases Expected Eggs on the Flock, not on the hens counted at Closing', async () => {
+    // May: 5 hens × 0.80 = 4 expected, even though only 1 hen was counted.
+    const { user } = renderToday({ hens: 5, roosters: 0 }, '2026-05-11');
+    for (let i = 0; i < 4; i++) {
+      await user.click(closingCard().getByRole('button', { name: 'Mniej kur' }));
+    }
+    await user.click(closingCard().getByRole('button', { name: 'Zamknij kurnik' }));
+    expect(closingCard().getByRole('alert')).toHaveTextContent('Brakuje 4 kur');
+
+    const eggCard = within(screen.getByRole('region', { name: 'Jajka' }));
+    for (let i = 0; i < 4; i++) {
+      await user.click(eggCard.getByRole('button', { name: 'Dodaj jajko' }));
+    }
+
+    expect(eggCard.getByText('Oczekiwane: 4')).toBeInTheDocument();
+    expect(eggCard.getByText('Ocena: norma')).toBeInTheDocument();
+  });
+
   it('lets the keeper correct a saved Closing', async () => {
     const { user, storage } = renderToday({ hens: 5, roosters: 1 });
     await user.click(closingCard().getByRole('button', { name: 'Mniej kur' }));

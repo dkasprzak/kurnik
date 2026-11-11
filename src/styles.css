@@ -202,3 +202,58 @@ h1 {
 .closing-shortfall p {
   margin: 0;
 }
+
+.egg-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 8px 0 12px;
+}
+
+.egg-stepper-button {
+  width: 72px;
+  height: 72px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.egg-stepper-button:active {
+  filter: brightness(0.9);
+}
+
+.egg-stepper-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.egg-stepper-value {
+  flex: 1;
+  text-align: center;
+  font-size: 2.6rem;
+  font-weight: 700;
+}
+
+.egg-rating {
+  margin: 4px 0 0;
+  font-weight: 700;
+}
+
+.egg-rating-poor {
+  color: var(--danger);
+}
+
+.egg-rating-normal {
+  color: var(--text);
+}
+
+.egg-rating-great {
+  color: #2e7d32;
+}

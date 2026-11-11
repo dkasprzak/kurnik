@@ -54,8 +54,8 @@ export function validateFlock(flock: Flock): FlockError | undefined {
 export const emptyAppState = (): AppState => ({ dayEntries: {} });
 
 /**
- * The Day Entry for a date, or a new one holding a snapshot of the current Flock.
- * A new entry is not stored until the caller saves a state containing it.
+ * The Day Entry for a date, or a new one with a snapshot of the current Flock
+ * if none exists yet. Requires the Flock to be set up.
  */
 export function getOrCreateDayEntry(state: AppState, date: DateKey): DayEntry {
   const existing = state.dayEntries[date];
@@ -90,4 +90,41 @@ export function shortfallOf(flock: Flock, closing: Closing): Shortfall {
 /** True when no bird is missing ("all in"). */
 export function isAllIn(shortfall: Shortfall): boolean {
   return shortfall.hens === 0 && shortfall.roosters === 0;
+}
+
+/** Laying Rate per month, January first (fixed, not configurable). */
+const LAYING_RATE_BY_MONTH = [0.3, 0.4, 0.65, 0.8, 0.8, 0.75, 0.7, 0.65, 0.55, 0.4, 0.25, 0.25] as const;
+
+/** The expected fraction of hens laying an egg on the given date. */
+export function layingRate(date: DateKey): number {
+  return LAYING_RATE_BY_MONTH[fromDateKey(date).getMonth()];
+}
+
+/** Hens in the day's Flock × the month's Laying Rate. */
+export function expectedEggs(flock: Flock, date: DateKey): number {
+  return flock.hens * layingRate(date);
+}
+
+export type EggRating = 'poor' | 'normal' | 'great';
+
+/**
+ * Compares the Egg Count with Expected Eggs: below 60% is poor, 60–120%
+ * inclusive is normal, above 120% is great. Undefined when the Flock has no hens.
+ */
+export function rateEggCount(eggCount: number, flock: Flock, date: DateKey): EggRating | undefined {
+  const expected = expectedEggs(flock, date);
+  if (flock.hens === 0 || expected === 0) return undefined;
+  const ratio = eggCount / expected;
+  if (ratio < 0.6) return 'poor';
+  if (ratio > 1.2) return 'great';
+  return 'normal';
+}
+
+/** Records the Egg Count for a date, creating its Day Entry if needed. */
+export function saveEggCount(state: AppState, date: DateKey, eggCount: number): AppState {
+  const entry = getOrCreateDayEntry(state, date);
+  return {
+    ...state,
+    dayEntries: { ...state.dayEntries, [date]: { ...entry, eggCount: Math.max(0, eggCount) } },
+  };
 }
