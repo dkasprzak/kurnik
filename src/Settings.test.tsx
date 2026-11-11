@@ -1,38 +1,14 @@
-import { screen, within } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import type { AppStorage } from './storage';
-import { createMemoryStorage } from './storage';
-import type { Flock } from './domain';
 import { renderApp } from './test/renderApp';
+import { closingCard, nav, storageWithFlock, submitFlockForm, type User } from './test/helpers';
 
-function storageWithFlock(flock: Flock) {
-  return createMemoryStorage({ flock, dayEntries: {} });
-}
-
-function nav() {
-  return within(screen.getByRole('navigation', { name: 'Nawigacja' }));
-}
-
-async function openSettings(user: ReturnType<typeof renderApp>['user']) {
+async function openSettings(user: User) {
   await user.click(nav().getByRole('button', { name: 'Ustawienia' }));
 }
 
-async function openToday(user: ReturnType<typeof renderApp>['user']) {
+async function openToday(user: User) {
   await user.click(nav().getByRole('button', { name: 'Dziś' }));
-}
-
-async function changeFlock(
-  user: ReturnType<typeof renderApp>['user'],
-  { hens, roosters }: Flock,
-) {
-  await user.clear(screen.getByLabelText('Kury'));
-  await user.type(screen.getByLabelText('Kury'), String(hens));
-  await user.clear(screen.getByLabelText('Koguty'));
-  await user.type(screen.getByLabelText('Koguty'), String(roosters));
-  await user.click(screen.getByRole('button', { name: 'Zapisz' }));
-}
-
-function closingCard() {
-  return within(screen.getByRole('region', { name: 'Zamknięcie kurnika' }));
 }
 
 function renderWith(storage: AppStorage, today = '2026-11-11') {
@@ -66,7 +42,7 @@ describe('Settings', () => {
     const { user } = renderWith(storage);
 
     await openSettings(user);
-    await changeFlock(user, { hens: 0, roosters: 0 });
+    await submitFlockForm(user, { hens: 0, roosters: 0 });
 
     expect(screen.getByRole('alert')).toHaveTextContent('Stado musi mieć co najmniej jednego ptaka.');
     expect(storage.load().flock).toEqual({ hens: 5, roosters: 1 });
@@ -76,7 +52,7 @@ describe('Settings', () => {
     const { user } = renderWith(storageWithFlock({ hens: 5, roosters: 1 }));
 
     await openSettings(user);
-    await changeFlock(user, { hens: 7, roosters: 2 });
+    await submitFlockForm(user, { hens: 7, roosters: 2 });
     expect(screen.getByRole('status')).toHaveTextContent('Zapisano: 7 kur, 2 koguty');
     await openToday(user);
 
@@ -88,7 +64,7 @@ describe('Settings', () => {
     const storage = storageWithFlock({ hens: 5, roosters: 1 });
     const first = renderWith(storage);
     await openSettings(first.user);
-    await changeFlock(first.user, { hens: 3, roosters: 0 });
+    await submitFlockForm(first.user, { hens: 3, roosters: 0 });
     first.unmount();
 
     const { user } = renderWith(storage);
@@ -111,7 +87,7 @@ describe('Settings', () => {
     // Today: the keeper grows the Flock to 8 hens.
     const today = renderWith(storage, '2026-11-11');
     await openSettings(today.user);
-    await changeFlock(today.user, { hens: 8, roosters: 1 });
+    await submitFlockForm(today.user, { hens: 8, roosters: 1 });
     today.unmount();
 
     // Yesterday's Day Entry is still compared against yesterday's Flock.
@@ -126,7 +102,7 @@ describe('Settings', () => {
 
     await user.click(closingCard().getByRole('button', { name: 'Zamknij kurnik' }));
     await openSettings(user);
-    await changeFlock(user, { hens: 6, roosters: 1 });
+    await submitFlockForm(user, { hens: 6, roosters: 1 });
     await openToday(user);
     // Today's Closing of 5 hens is now compared against the new 6-hen Flock.
     expect(closingCard().getByRole('alert')).toHaveTextContent('Brakuje 1 kury');

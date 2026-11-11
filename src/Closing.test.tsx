@@ -1,17 +1,6 @@
-import { screen, within } from '@testing-library/react';
-import type { Flock } from './domain';
-import { createMemoryStorage } from './storage';
+import { screen } from '@testing-library/react';
 import { renderApp } from './test/renderApp';
-
-/** Opens the app on the Today screen with an already configured Flock. */
-function renderToday(flock: Flock, today = '2026-11-11') {
-  const storage = createMemoryStorage({ flock, dayEntries: {} });
-  return renderApp({ today, storage });
-}
-
-function closingCard() {
-  return within(screen.getByRole('region', { name: 'Zamknięcie kurnika' }));
-}
+import { closingCard, eggCard, renderToday } from './test/helpers';
 
 describe('Closing', () => {
   it('prefills the hen and rooster steppers with the full Flock', () => {
@@ -135,13 +124,12 @@ describe('Closing', () => {
     await user.click(closingCard().getByRole('button', { name: 'Zamknij kurnik' }));
     expect(closingCard().getByRole('alert')).toHaveTextContent('Brakuje 4 kur');
 
-    const eggCard = within(screen.getByRole('region', { name: 'Jajka' }));
     for (let i = 0; i < 4; i++) {
-      await user.click(eggCard.getByRole('button', { name: 'Dodaj jajko' }));
+      await user.click(eggCard().getByRole('button', { name: 'Dodaj jajko' }));
     }
 
-    expect(eggCard.getByText('Oczekiwane: 4')).toBeInTheDocument();
-    expect(eggCard.getByText('Ocena: norma')).toBeInTheDocument();
+    expect(eggCard().getByText('Oczekiwane: 4')).toBeInTheDocument();
+    expect(eggCard().getByText('Ocena: norma')).toBeInTheDocument();
   });
 
   it('lets the keeper correct a saved Closing', async () => {

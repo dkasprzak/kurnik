@@ -2,18 +2,14 @@ import { screen, within } from '@testing-library/react';
 import type { AppState } from './domain';
 import { createMemoryStorage } from './storage';
 import { renderApp } from './test/renderApp';
+import { closingCard, eggCard, nav, storageWithFlock, type User } from './test/helpers';
 
-type User = ReturnType<typeof renderApp>['user'];
-
-const nav = () => screen.getByRole('navigation', { name: 'Nawigacja' });
-const openHistory = (user: User) => user.click(within(nav()).getByRole('button', { name: 'Historia' }));
+const openHistory = (user: User) => user.click(nav().getByRole('button', { name: 'Historia' }));
 const dayList = () => screen.getByRole('list', { name: 'Dni' });
 const dayRows = () => within(dayList()).getAllByRole('listitem');
-const eggCard = () => screen.getByRole('region', { name: 'Jajka' });
-const closingCard = () => screen.getByRole('region', { name: 'Zamknięcie kurnika' });
 
 function seededStorage(dayEntries: AppState['dayEntries']) {
-  return createMemoryStorage({ flock: { hens: 5, roosters: 1 }, dayEntries });
+  return storageWithFlock({ hens: 5, roosters: 1 }, dayEntries);
 }
 
 describe('History', () => {
@@ -68,11 +64,11 @@ describe('History', () => {
     await user.click(within(dayList()).getByRole('button', { name: /poniedziałek, 9 listopada 2026/ }));
 
     expect(screen.getByRole('heading', { name: 'poniedziałek, 9 listopada 2026' })).toBeInTheDocument();
-    expect(within(eggCard()).getByLabelText('Jajka')).toHaveTextContent('1');
-    await user.click(within(eggCard()).getByRole('button', { name: 'Dodaj jajko' }));
-    await user.click(within(closingCard()).getByRole('button', { name: 'Mniej kur' }));
-    await user.click(within(closingCard()).getByRole('button', { name: 'Zamknij kurnik' }));
-    expect(within(closingCard()).getByText('Brakuje 1 kury')).toBeInTheDocument();
+    expect(eggCard().getByLabelText('Jajka')).toHaveTextContent('1');
+    await user.click(eggCard().getByRole('button', { name: 'Dodaj jajko' }));
+    await user.click(closingCard().getByRole('button', { name: 'Mniej kur' }));
+    await user.click(closingCard().getByRole('button', { name: 'Zamknij kurnik' }));
+    expect(closingCard().getByText('Brakuje 1 kury')).toBeInTheDocument();
 
     expect(storage.load().dayEntries).toEqual({
       '2026-11-09': { flock: { hens: 5, roosters: 1 }, eggCount: 2, closing: { hens: 4, roosters: 1 } },
@@ -98,8 +94,8 @@ describe('History', () => {
     expect(dayRows()[0]).toHaveTextContent('Jajka: 7 (norma)');
 
     await user.click(within(dayList()).getByRole('button', { name: /20 maja 2026/ }));
-    expect(within(eggCard()).getByText('Oczekiwane: 8')).toBeInTheDocument();
-    expect(within(eggCard()).getByText('Ocena: norma')).toBeInTheDocument();
+    expect(eggCard().getByText('Oczekiwane: 8')).toBeInTheDocument();
+    expect(eggCard().getByText('Ocena: norma')).toBeInTheDocument();
   });
 
   it('backfills a past day without an entry using a snapshot of the current Flock', async () => {
@@ -113,7 +109,7 @@ describe('History', () => {
 
     expect(screen.getByRole('heading', { name: 'wtorek, 10 listopada 2026' })).toBeInTheDocument();
     expect(screen.getByText('Brak wpisu dla tego dnia')).toBeInTheDocument();
-    await user.click(within(eggCard()).getByRole('button', { name: 'Dodaj jajko' }));
+    await user.click(eggCard().getByRole('button', { name: 'Dodaj jajko' }));
 
     expect(storage.load().dayEntries).toEqual({
       '2026-11-10': { flock: { hens: 5, roosters: 1 }, eggCount: 1 },
@@ -129,13 +125,13 @@ describe('History', () => {
     await user.type(screen.getByLabelText('Wybierz dzień'), '2026-11-10');
     await user.click(screen.getByRole('button', { name: 'Otwórz dzień' }));
 
-    expect(within(eggCard()).getByLabelText('Jajka')).toHaveTextContent('—');
-    expect(within(eggCard()).queryByText(/^Ocena:/)).not.toBeInTheDocument();
+    expect(eggCard().getByLabelText('Jajka')).toHaveTextContent('—');
+    expect(eggCard().queryByText(/^Ocena:/)).not.toBeInTheDocument();
 
-    await user.click(within(eggCard()).getByRole('button', { name: '0 jaj' }));
+    await user.click(eggCard().getByRole('button', { name: '0 jaj' }));
 
-    expect(within(eggCard()).getByLabelText('Jajka')).toHaveTextContent('0');
-    expect(within(eggCard()).getByText('Ocena: słabo')).toBeInTheDocument();
+    expect(eggCard().getByLabelText('Jajka')).toHaveTextContent('0');
+    expect(eggCard().getByText('Ocena: słabo')).toBeInTheDocument();
     expect(storage.load().dayEntries['2026-11-10'].eggCount).toBe(0);
   });
 
@@ -145,17 +141,17 @@ describe('History', () => {
     await openHistory(first.user);
     await first.user.type(screen.getByLabelText('Wybierz dzień'), '2026-11-10');
     await first.user.click(screen.getByRole('button', { name: 'Otwórz dzień' }));
-    await first.user.click(within(eggCard()).getByRole('button', { name: 'Dodaj jajko' }));
-    await first.user.click(within(eggCard()).getByRole('button', { name: 'Dodaj jajko' }));
-    await first.user.click(within(closingCard()).getByRole('button', { name: 'Zamknij kurnik' }));
+    await first.user.click(eggCard().getByRole('button', { name: 'Dodaj jajko' }));
+    await first.user.click(eggCard().getByRole('button', { name: 'Dodaj jajko' }));
+    await first.user.click(closingCard().getByRole('button', { name: 'Zamknij kurnik' }));
     first.unmount();
 
     const { user } = renderApp({ today: '2026-11-11', storage });
     await openHistory(user);
     await user.click(within(dayList()).getByRole('button', { name: /wtorek, 10 listopada 2026/ }));
 
-    expect(within(eggCard()).getByLabelText('Jajka')).toHaveTextContent('2');
-    expect(within(closingCard()).getByText('Wszystkie ptaki w kurniku')).toBeInTheDocument();
+    expect(eggCard().getByLabelText('Jajka')).toHaveTextContent('2');
+    expect(closingCard().getByText('Wszystkie ptaki w kurniku')).toBeInTheDocument();
   });
 
   it('does not allow a future date to be opened', async () => {
