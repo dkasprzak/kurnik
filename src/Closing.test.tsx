@@ -89,7 +89,7 @@ describe('Closing', () => {
     await user.click(closingCard().getByRole('button', { name: 'Zamknij kurnik' }));
 
     expect(screen.getByText('5 kur, 1 kogut')).toBeInTheDocument();
-    expect(storage.load().flock).toEqual({ hens: 5, roosters: 1 });
+    expect(storage.current().flock).toEqual({ hens: 5, roosters: 1 });
   });
 
   it("saves the Closing into today's Day Entry with a snapshot of the Flock", async () => {
@@ -98,7 +98,7 @@ describe('Closing', () => {
     await user.click(closingCard().getByRole('button', { name: 'Mniej kur' }));
     await user.click(closingCard().getByRole('button', { name: 'Zamknij kurnik' }));
 
-    expect(storage.load().dayEntries['2026-05-03']).toEqual({
+    expect(storage.current().dayEntries['2026-05-03']).toEqual({
       flock: { hens: 5, roosters: 1 },
       closing: { hens: 4, roosters: 1 },
     });
@@ -143,6 +143,6 @@ describe('Closing', () => {
     await user.click(closingCard().getByRole('button', { name: 'Zapisz zamknięcie' }));
 
     expect(closingCard().getByText('Wszystkie ptaki w kurniku')).toBeInTheDocument();
-    expect(storage.load().dayEntries['2026-11-11'].closing).toEqual({ hens: 5, roosters: 1 });
+    expect(storage.current().dayEntries['2026-11-11'].closing).toEqual({ hens: 5, roosters: 1 });
   });
 });

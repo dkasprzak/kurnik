@@ -54,38 +54,49 @@ export function validateFlock(flock: Flock): FlockError | undefined {
 
 export const emptyAppState = (): AppState => ({ dayEntries: {} });
 
+/** Fields to merge into one Day Entry; fields left out are kept as stored. */
+export type DayEntryPatch = Partial<DayEntry>;
+
+/**
+ * A granular write to the Household data, decided by the domain: only the fields
+ * listed here change, so two Keepers editing different fields never overwrite each other.
+ */
+export type StateChange = {
+  flock?: Flock;
+  dayEntries?: Record<DateKey, DayEntryPatch>;
+};
+
+/** Merges a change into the state (what every storage does when persisting it). */
+export function applyChange(state: AppState, change: StateChange): AppState {
+  const dayEntries = { ...state.dayEntries };
+  for (const [date, patch] of Object.entries(change.dayEntries ?? {})) {
+    dayEntries[date] = { ...dayEntries[date], ...patch } as DayEntry;
+  }
+  return { flock: change.flock ?? state.flock, dayEntries };
+}
+
 /**
  * Replaces the Flock. Today's Day Entry (if any) takes the new Flock as its
  * snapshot; past Day Entries keep theirs.
  */
-export function changeFlock(state: AppState, today: DateKey, flock: Flock): AppState {
-  const todayEntry = state.dayEntries[today];
-  if (!todayEntry) return { ...state, flock };
-  return {
-    ...state,
-    flock,
-    dayEntries: { ...state.dayEntries, [today]: { ...todayEntry, flock: { ...flock } } },
-  };
+export function flockChange(state: AppState, today: DateKey, flock: Flock): StateChange {
+  if (!state.dayEntries[today]) return { flock: { ...flock } };
+  return { flock: { ...flock }, dayEntries: { [today]: { flock: { ...flock } } } };
 }
 
 /**
- * The Day Entry for a date, or a new one with a snapshot of the current Flock
- * if none exists yet. Requires the Flock to be set up.
+ * Sets fields of a day's Day Entry; when the entry does not exist yet it is
+ * created with a snapshot of the current Flock. Requires the Flock to be set up.
  */
-export function getOrCreateDayEntry(state: AppState, date: DateKey): DayEntry {
-  const existing = state.dayEntries[date];
-  if (existing) return existing;
+function dayEntryChange(state: AppState, date: DateKey, patch: DayEntryPatch): StateChange {
+  if (state.dayEntries[date]) return { dayEntries: { [date]: patch } };
   if (!state.flock) throw new Error('Cannot create a Day Entry before the Flock is set up');
-  return { flock: { ...state.flock } };
+  return { dayEntries: { [date]: { flock: { ...state.flock }, ...patch } } };
 }
 
 /** Saves (or replaces) the Closing of a day, creating its Day Entry if needed. Never changes the Flock. */
-export function saveClosing(state: AppState, date: DateKey, closing: Closing): AppState {
-  const entry = getOrCreateDayEntry(state, date);
-  return {
-    ...state,
-    dayEntries: { ...state.dayEntries, [date]: { ...entry, closing: { ...closing } } },
-  };
+export function closingChange(state: AppState, date: DateKey, closing: Closing): StateChange {
+  return dayEntryChange(state, date, { closing: { ...closing } });
 }
 
 /** Birds missing at Closing, per bird type. */
@@ -133,12 +144,8 @@ export function rateEggCount(eggCount: number, flock: Flock, date: DateKey): Egg
 }
 
 /** Records the Egg Count for a date, creating its Day Entry if needed. */
-export function saveEggCount(state: AppState, date: DateKey, eggCount: number): AppState {
-  const entry = getOrCreateDayEntry(state, date);
-  return {
-    ...state,
-    dayEntries: { ...state.dayEntries, [date]: { ...entry, eggCount: Math.max(0, eggCount) } },
-  };
+export function eggCountChange(state: AppState, date: DateKey, eggCount: number): StateChange {
+  return dayEntryChange(state, date, { eggCount: Math.max(0, eggCount) });
 }
 
 /** The date `days` calendar days after `date` (negative goes back). */

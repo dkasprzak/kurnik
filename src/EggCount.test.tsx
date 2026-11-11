@@ -21,7 +21,7 @@ describe('Egg Count', () => {
     expect(eggCard().getByText('Oczekiwane: 1,3')).toBeInTheDocument();
     expect(rating()).not.toBeInTheDocument();
     expect(eggCard().getByRole('button', { name: 'Odejmij jajko' })).toBeDisabled();
-    expect(storage.load().dayEntries).toEqual({});
+    expect(storage.current().dayEntries).toEqual({});
   });
 
   it('records 1 egg on the first tap of +', async () => {
@@ -31,7 +31,7 @@ describe('Egg Count', () => {
     await addEgg(user);
 
     expect(eggCountValue()).toHaveTextContent('1');
-    expect(storage.load().dayEntries['2026-11-11'].eggCount).toBe(1);
+    expect(storage.current().dayEntries['2026-11-11'].eggCount).toBe(1);
   });
 
   it('records zero eggs explicitly, with an Egg Rating', async () => {
@@ -42,7 +42,7 @@ describe('Egg Count', () => {
 
     expect(eggCountValue()).toHaveTextContent('0');
     expect(rating()).toHaveTextContent('Ocena: słabo');
-    expect(storage.load().dayEntries['2026-11-11'].eggCount).toBe(0);
+    expect(storage.current().dayEntries['2026-11-11'].eggCount).toBe(0);
     expect(eggCard().getByRole('button', { name: 'Odejmij jajko' })).toBeDisabled();
     expect(eggCard().queryByRole('button', { name: 'Dziś 0 jaj' })).not.toBeInTheDocument();
   });
@@ -80,11 +80,11 @@ describe('Egg Count', () => {
   it("creates today's Day Entry with a snapshot of the Flock when eggs are first recorded", async () => {
     const { user, storage } = renderApp({ signedIn: true, today: '2026-11-11' });
     await submitFlockForm(user, { hens: 5, roosters: 1 });
-    expect(storage.load().dayEntries).toEqual({});
+    expect(storage.current().dayEntries).toEqual({});
 
     await addEgg(user);
 
-    expect(storage.load().dayEntries['2026-11-11']).toEqual({
+    expect(storage.current().dayEntries['2026-11-11']).toEqual({
       flock: { hens: 5, roosters: 1 },
       eggCount: 1,
     });

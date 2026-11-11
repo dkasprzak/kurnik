@@ -8,13 +8,13 @@ See `.scratch/kury-prototype/spec.md` (Amendment 1, stories 43–45) and `docs/a
 
 **Blocked by:** 09 (Sign in with the Household Account)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Storage seam is subscribe + granular writes; screens render from the subscribed state
-- [ ] In-memory storage implements the new interface; all existing tests pass on it
-- [ ] Test: a change written to storage from outside the UI (simulating the other Keeper) appears on screen without remounting
-- [ ] Test: saving the Egg Count and saving the Closing for the same day both survive, in either order
-- [ ] Firestore adapter: one Flock document and one document per Day Entry (keyed by date) under the account's uid; writes merge only the changed fields
-- [ ] Firestore offline persistence enabled (persistent local cache)
-- [ ] `firestore.rules` allows reads and writes only to the signed-in account's own documents; `firebase.json` references it
+- [x] Storage seam is subscribe + granular writes; screens render from the subscribed state
+- [x] In-memory storage implements the new interface; all existing tests pass on it
+- [x] Test: a change written to storage from outside the UI (simulating the other Keeper) appears on screen without remounting
+- [x] Test: saving the Egg Count and saving the Closing for the same day both survive, in either order
+- [x] Firestore adapter: one Flock document and one document per Day Entry (keyed by date) under the account's uid; writes merge only the changed fields
+- [x] Firestore offline persistence enabled (persistent local cache)
+- [x] `firestore.rules` allows reads and writes only to the signed-in account's own documents; `firebase.json` references it
 - [ ] Manual check (after 08): two browsers signed in to the same account see each other's changes live

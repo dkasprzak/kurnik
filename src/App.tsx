@@ -1,8 +1,17 @@
 import { useEffect, useState } from 'react';
 import type { Account, AuthAdapter } from './auth';
 import { systemClock, type Clock } from './clock';
-import { changeFlock, saveClosing, saveEggCount, toDateKey, type AppState, type DateKey, type Flock } from './domain';
-import { createLocalStorage, type AppStorage } from './storage';
+import {
+  closingChange,
+  eggCountChange,
+  flockChange,
+  toDateKey,
+  type AppState,
+  type DateKey,
+  type Flock,
+  type StateChange,
+} from './domain';
+import type { AppStorage } from './storage';
 import { BottomNav, type Tab } from './components/BottomNav';
 import type { DayCardsHandlers } from './components/DayCards';
 import { DayDetailScreen } from './screens/DayDetailScreen';
@@ -15,13 +24,11 @@ import { TodayScreen } from './screens/TodayScreen';
 export type AppProps = {
   /** Source of "today"; defaults to the real date. */
   clock?: Clock;
-  /** Persistence of the whole app state; defaults to localStorage. */
-  storage?: AppStorage;
+  /** Opens the shared data of a Household Account (Firestore in the real app, in-memory in tests). */
+  openStorage: (account: Account) => AppStorage;
   /** Sign-in to the Household Account (Firebase in the real app, a fake in tests). */
   auth: AuthAdapter;
 };
-
-const defaultStorage = createLocalStorage();
 
 /** Gates the app behind the Household Account sign-in. */
 export function App({ auth, ...rest }: AppProps) {
@@ -45,27 +52,31 @@ type HouseholdAppProps = Omit<AppProps, 'auth'> & {
   onSignOut: () => void;
 };
 
-function HouseholdApp({ clock = systemClock, storage = defaultStorage, onSignOut }: HouseholdAppProps) {
-  const [state, setState] = useState<AppState>(() => storage.load());
+function HouseholdApp({ clock = systemClock, openStorage, account, onSignOut }: HouseholdAppProps) {
+  // HouseholdApp is keyed by uid, so the storage is opened once per account.
+  const [storage] = useState(() => openStorage(account));
+  /** undefined until the first snapshot of the shared data arrives. */
+  const [state, setState] = useState<AppState | undefined>(undefined);
   const [tab, setTab] = useState<Tab>('today');
   /** The day open in the day detail screen (History tab only). */
   const [openDay, setOpenDay] = useState<DateKey | undefined>(undefined);
   const today = toDateKey(clock());
 
-  function update(next: AppState) {
-    storage.save(next);
-    setState(next);
+  useEffect(() => storage.subscribe(setState), [storage]);
+
+  function write(change: (state: AppState) => StateChange) {
+    if (state) storage.write(change(state));
   }
 
   function saveFlock(flock: Flock) {
-    update(changeFlock(state, today, flock));
+    write((s) => flockChange(s, today, flock));
   }
 
   /** Records the Egg Count and Closing of one day. */
   function dayHandlers(date: DateKey): DayCardsHandlers {
     return {
-      onSaveClosing: (closing) => update(saveClosing(state, date, closing)),
-      onEggCountChange: (eggCount) => update(saveEggCount(state, date, eggCount)),
+      onSaveClosing: (closing) => write((s) => closingChange(s, date, closing)),
+      onEggCountChange: (eggCount) => write((s) => eggCountChange(s, date, eggCount)),
     };
   }
 
@@ -74,6 +85,9 @@ function HouseholdApp({ clock = systemClock, storage = defaultStorage, onSignOut
     setOpenDay(undefined);
   }
 
+  if (!state) {
+    return <p className="hint">Wczytywanie danych…</p>;
+  }
   if (!state.flock) {
     return <FlockSetupScreen onSave={saveFlock} />;
   }

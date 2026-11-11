@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react';
-import type { AppStorage } from './storage';
+import type { MemoryStorage } from './storage';
 import { renderApp } from './test/renderApp';
 import { closingCard, nav, storageWithFlock, submitFlockForm, type User } from './test/helpers';
 
@@ -11,7 +11,7 @@ async function openToday(user: User) {
   await user.click(nav().getByRole('button', { name: 'Dziś' }));
 }
 
-function renderWith(storage: AppStorage, today = '2026-11-11') {
+function renderWith(storage: MemoryStorage, today = '2026-11-11') {
   return renderApp({ signedIn: true, today, storage });
 }
 
@@ -45,7 +45,7 @@ describe('Settings', () => {
     await submitFlockForm(user, { hens: 0, roosters: 0 });
 
     expect(screen.getByRole('alert')).toHaveTextContent('Stado musi mieć co najmniej jednego ptaka.');
-    expect(storage.load().flock).toEqual({ hens: 5, roosters: 1 });
+    expect(storage.current().flock).toEqual({ hens: 5, roosters: 1 });
   });
 
   it('prefills the Closing steppers with the new Flock after saving', async () => {

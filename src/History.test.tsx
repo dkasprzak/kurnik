@@ -70,7 +70,7 @@ describe('History', () => {
     await user.click(closingCard().getByRole('button', { name: 'Zamknij kurnik' }));
     expect(closingCard().getByText('Brakuje 1 kury')).toBeInTheDocument();
 
-    expect(storage.load().dayEntries).toEqual({
+    expect(storage.current().dayEntries).toEqual({
       '2026-11-09': { flock: { hens: 5, roosters: 1 }, eggCount: 2, closing: { hens: 4, roosters: 1 } },
     });
 
@@ -111,7 +111,7 @@ describe('History', () => {
     expect(screen.getByText('Brak wpisu dla tego dnia')).toBeInTheDocument();
     await user.click(eggCard().getByRole('button', { name: 'Dodaj jajko' }));
 
-    expect(storage.load().dayEntries).toEqual({
+    expect(storage.current().dayEntries).toEqual({
       '2026-11-10': { flock: { hens: 5, roosters: 1 }, eggCount: 1 },
     });
     await user.click(screen.getByRole('button', { name: 'Wróć do historii' }));
@@ -132,7 +132,7 @@ describe('History', () => {
 
     expect(eggCard().getByLabelText('Jajka')).toHaveTextContent('0');
     expect(eggCard().getByText('Ocena: słabo')).toBeInTheDocument();
-    expect(storage.load().dayEntries['2026-11-10'].eggCount).toBe(0);
+    expect(storage.current().dayEntries['2026-11-10'].eggCount).toBe(0);
   });
 
   it('keeps a backfilled past day after the app is reopened', async () => {

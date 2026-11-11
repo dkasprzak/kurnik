@@ -29,4 +29,6 @@ Inne polecenia:
 
 Aby dodać aplikację do ekranu głównego: w Chrome (Android) menu ⋮ → „Dodaj do ekranu głównego”, w Safari (iOS) „Udostępnij” → „Do ekranu początkowego”.
 
-Dane są zapisywane tylko w przeglądarce na tym urządzeniu (localStorage).
+Dane (stado i wpisy dni) są w Firestore pod kontem domowym (`households/{uid}` i `households/{uid}/dayEntries/{RRRR-MM-DD}`), więc oba telefony widzą te same dane na bieżąco. Wpisy zrobione bez zasięgu zapisują się na telefonie i synchronizują po odzyskaniu połączenia.
+
+Przed pierwszym uruchomieniem utwórz bazę Firestore w konsoli Firebase (region `europe-central2`) i wgraj reguły bezpieczeństwa: `npx firebase-tools deploy --only firestore:rules` (plik `firestore.rules`).
