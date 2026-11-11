@@ -68,7 +68,7 @@ describe('History', () => {
     await user.click(within(dayList()).getByRole('button', { name: /poniedziałek, 9 listopada 2026/ }));
 
     expect(screen.getByRole('heading', { name: 'poniedziałek, 9 listopada 2026' })).toBeInTheDocument();
-    expect(within(eggCard()).getByTestId('egg-count')).toHaveTextContent('1');
+    expect(within(eggCard()).getByLabelText('Jajka')).toHaveTextContent('1');
     await user.click(within(eggCard()).getByRole('button', { name: 'Dodaj jajko' }));
     await user.click(within(closingCard()).getByRole('button', { name: 'Mniej kur' }));
     await user.click(within(closingCard()).getByRole('button', { name: 'Zamknij kurnik' }));
@@ -120,6 +120,42 @@ describe('History', () => {
     });
     await user.click(screen.getByRole('button', { name: 'Wróć do historii' }));
     expect(dayRows()[0]).toHaveTextContent('wtorek, 10 listopada 2026');
+  });
+
+  it('shows an empty past day with no Egg Count and no Egg Rating until "0 jaj" is recorded', async () => {
+    const storage = seededStorage({});
+    const { user } = renderApp({ today: '2026-11-11', storage });
+    await openHistory(user);
+    await user.type(screen.getByLabelText('Wybierz dzień'), '2026-11-10');
+    await user.click(screen.getByRole('button', { name: 'Otwórz dzień' }));
+
+    expect(within(eggCard()).getByLabelText('Jajka')).toHaveTextContent('—');
+    expect(within(eggCard()).queryByText(/^Ocena:/)).not.toBeInTheDocument();
+
+    await user.click(within(eggCard()).getByRole('button', { name: '0 jaj' }));
+
+    expect(within(eggCard()).getByLabelText('Jajka')).toHaveTextContent('0');
+    expect(within(eggCard()).getByText('Ocena: słabo')).toBeInTheDocument();
+    expect(storage.load().dayEntries['2026-11-10'].eggCount).toBe(0);
+  });
+
+  it('keeps a backfilled past day after the app is reopened', async () => {
+    const storage = seededStorage({});
+    const first = renderApp({ today: '2026-11-11', storage });
+    await openHistory(first.user);
+    await first.user.type(screen.getByLabelText('Wybierz dzień'), '2026-11-10');
+    await first.user.click(screen.getByRole('button', { name: 'Otwórz dzień' }));
+    await first.user.click(within(eggCard()).getByRole('button', { name: 'Dodaj jajko' }));
+    await first.user.click(within(eggCard()).getByRole('button', { name: 'Dodaj jajko' }));
+    await first.user.click(within(closingCard()).getByRole('button', { name: 'Zamknij kurnik' }));
+    first.unmount();
+
+    const { user } = renderApp({ today: '2026-11-11', storage });
+    await openHistory(user);
+    await user.click(within(dayList()).getByRole('button', { name: /wtorek, 10 listopada 2026/ }));
+
+    expect(within(eggCard()).getByLabelText('Jajka')).toHaveTextContent('2');
+    expect(within(closingCard()).getByText('Wszystkie ptaki w kurniku')).toBeInTheDocument();
   });
 
   it('does not allow a future date to be opened', async () => {

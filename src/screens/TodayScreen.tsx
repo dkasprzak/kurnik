@@ -1,20 +1,15 @@
-import type { Closing, DateKey, DayEntry, Flock } from '../domain';
-import { ClosingCard } from '../components/ClosingCard';
+import type { DateKey, DayEntry, Flock } from '../domain';
+import { DayCards, type DayCardsHandlers } from '../components/DayCards';
 import { describeFlock, formatLongDate } from '../polish';
-import { EggCountCard } from './EggCountCard';
 
-type Props = {
+type Props = DayCardsHandlers & {
   today: DateKey;
   flock: Flock;
   /** Today's Day Entry, if one exists yet. */
   dayEntry?: DayEntry;
-  onEggCountChange: (eggCount: number) => void;
-  onSaveClosing: (closing: Closing) => void;
 };
 
-export function TodayScreen({ today, flock, dayEntry, onEggCountChange, onSaveClosing }: Props) {
-  const dayFlock = dayEntry?.flock ?? flock;
-  const eggCount = dayEntry?.eggCount ?? 0;
+export function TodayScreen({ today, flock, dayEntry, ...handlers }: Props) {
   return (
     <main className="screen">
       <header className="screen-header">
@@ -25,8 +20,7 @@ export function TodayScreen({ today, flock, dayEntry, onEggCountChange, onSaveCl
         <p className="card-label">Twoje stado</p>
         <p className="card-value">{describeFlock(flock)}</p>
       </section>
-      <EggCountCard date={today} flock={dayFlock} eggCount={eggCount} onChange={onEggCountChange} />
-      <ClosingCard flock={dayFlock} closing={dayEntry?.closing} onSave={onSaveClosing} />
+      <DayCards date={today} flock={flock} dayEntry={dayEntry} isToday {...handlers} />
     </main>
   );
 }

@@ -5,7 +5,7 @@ import { setUpFlock } from './test/setUpFlock';
 type User = ReturnType<typeof renderApp>['user'];
 
 const eggCard = () => screen.getByRole('region', { name: 'Jajka' });
-const eggCountValue = () => within(eggCard()).getByTestId('egg-count');
+const eggCountValue = () => within(eggCard()).getByLabelText('Jajka dziś');
 const addEgg = (user: User) => user.click(within(eggCard()).getByRole('button', { name: 'Dodaj jajko' }));
 const removeEgg = (user: User) => user.click(within(eggCard()).getByRole('button', { name: 'Odejmij jajko' }));
 
@@ -13,18 +13,56 @@ async function addEggs(user: User, n: number) {
   for (let i = 0; i < n; i++) await addEgg(user);
 }
 
+const recordZero = (user: User) => user.click(within(eggCard()).getByRole('button', { name: 'Dziś 0 jaj' }));
+const rating = () => within(eggCard()).queryByText(/^Ocena:/);
+
 describe('Egg Count', () => {
+  it('shows no Egg Count and no Egg Rating before anything is recorded', async () => {
+    const { user, storage } = renderApp({ today: '2026-11-11' });
+    await setUpFlock(user, { hens: 5, roosters: 1 });
+
+    expect(eggCountValue()).toHaveTextContent('—');
+    expect(within(eggCard()).getByText('Oczekiwane: 1,3')).toBeInTheDocument();
+    expect(rating()).not.toBeInTheDocument();
+    expect(within(eggCard()).getByRole('button', { name: 'Odejmij jajko' })).toBeDisabled();
+    expect(storage.load().dayEntries).toEqual({});
+  });
+
+  it('records 1 egg on the first tap of +', async () => {
+    const { user, storage } = renderApp({ today: '2026-11-11' });
+    await setUpFlock(user, { hens: 5, roosters: 1 });
+
+    await addEgg(user);
+
+    expect(eggCountValue()).toHaveTextContent('1');
+    expect(storage.load().dayEntries['2026-11-11'].eggCount).toBe(1);
+  });
+
+  it('records zero eggs explicitly, with an Egg Rating', async () => {
+    const { user, storage } = renderApp({ today: '2026-11-11' });
+    await setUpFlock(user, { hens: 5, roosters: 1 });
+
+    await recordZero(user);
+
+    expect(eggCountValue()).toHaveTextContent('0');
+    expect(rating()).toHaveTextContent('Ocena: słabo');
+    expect(storage.load().dayEntries['2026-11-11'].eggCount).toBe(0);
+    expect(within(eggCard()).getByRole('button', { name: 'Odejmij jajko' })).toBeDisabled();
+    expect(within(eggCard()).queryByRole('button', { name: 'Dziś 0 jaj' })).not.toBeInTheDocument();
+  });
+
   it('counts eggs with +/− buttons and never goes below zero', async () => {
     const { user } = renderApp();
     await setUpFlock(user, { hens: 5, roosters: 1 });
 
-    expect(eggCountValue()).toHaveTextContent('0');
-    await removeEgg(user);
-    expect(eggCountValue()).toHaveTextContent('0');
-
     await addEggs(user, 3);
     await removeEgg(user);
     expect(eggCountValue()).toHaveTextContent('2');
+
+    await removeEgg(user);
+    await removeEgg(user);
+    expect(eggCountValue()).toHaveTextContent('0');
+    expect(within(eggCard()).getByRole('button', { name: 'Odejmij jajko' })).toBeDisabled();
   });
 
   it('keeps the Egg Count after reopening the app and lets it be changed again', async () => {
@@ -98,13 +136,14 @@ describe('Egg Count', () => {
     expect(within(eggCard()).queryByText(/^Ocena:/)).not.toBeInTheDocument();
   });
 
-  it('starts a new day at zero eggs', async () => {
+  it('starts a new day with no Egg Count recorded', async () => {
     const first = renderApp({ today: '2026-11-11' });
     await setUpFlock(first.user, { hens: 5, roosters: 1 });
     await addEggs(first.user, 2);
     first.unmount();
 
     renderApp({ today: '2026-11-12', storage: first.storage });
-    expect(eggCountValue()).toHaveTextContent('0');
+    expect(eggCountValue()).toHaveTextContent('—');
+    expect(rating()).not.toBeInTheDocument();
   });
 });

@@ -3,6 +3,7 @@ import { systemClock, type Clock } from './clock';
 import { changeFlock, saveClosing, saveEggCount, toDateKey, type AppState, type DateKey, type Flock } from './domain';
 import { createLocalStorage, type AppStorage } from './storage';
 import { BottomNav, type Tab } from './components/BottomNav';
+import type { DayCardsHandlers } from './components/DayCards';
 import { DayDetailScreen } from './screens/DayDetailScreen';
 import { FlockSetupScreen } from './screens/FlockSetupScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
@@ -34,6 +35,14 @@ export function App({ clock = systemClock, storage = defaultStorage }: AppProps)
     update(changeFlock(state, today, flock));
   }
 
+  /** Records the Egg Count and Closing of one day. */
+  function dayHandlers(date: DateKey): DayCardsHandlers {
+    return {
+      onSaveClosing: (closing) => update(saveClosing(state, date, closing)),
+      onEggCountChange: (eggCount) => update(saveEggCount(state, date, eggCount)),
+    };
+  }
+
   function selectTab(next: Tab) {
     setTab(next);
     setOpenDay(undefined);
@@ -49,8 +58,7 @@ export function App({ clock = systemClock, storage = defaultStorage }: AppProps)
           today={today}
           flock={state.flock}
           dayEntry={state.dayEntries[today]}
-          onSaveClosing={(closing) => update(saveClosing(state, today, closing))}
-          onEggCountChange={(eggCount) => update(saveEggCount(state, today, eggCount))}
+          {...dayHandlers(today)}
         />
       )}
       {tab === 'history' && !openDay && (
@@ -67,8 +75,7 @@ export function App({ clock = systemClock, storage = defaultStorage }: AppProps)
           date={openDay}
           flock={state.flock}
           dayEntry={state.dayEntries[openDay]}
-          onSaveClosing={(closing) => update(saveClosing(state, openDay, closing))}
-          onEggCountChange={(eggCount) => update(saveEggCount(state, openDay, eggCount))}
+          {...dayHandlers(openDay)}
           onBack={() => setOpenDay(undefined)}
         />
       )}
