@@ -10,6 +10,6 @@ See `.scratch/kury-prototype/spec.md` (Amendment 1, story 46).
 
 - [x] `firebase.json` configures Hosting to serve the production build (`dist/`) as a single-page app
 - [x] `npm run build && firebase deploy` publishes Hosting and the Firestore rules
-- [ ] Both phones open the public URL, sign in, and add the app to the home screen
-- [ ] An entry made on one phone shows up on the other
+- [x] Both phones open the public URL, sign in, and add the app to the home screen
+- [x] An entry made on one phone shows up on the other
 - [x] README explains how to deploy and how to change the Household Account password in the console
