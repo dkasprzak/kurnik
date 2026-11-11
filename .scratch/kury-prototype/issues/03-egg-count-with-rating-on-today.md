@@ -8,13 +8,13 @@ See `.scratch/kury-prototype/spec.md` (stories 18–26) and `GLOSSARY.md`.
 
 **Blocked by:** 01 (App skeleton and Flock setup)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Egg Count card shows large +/− buttons; the count cannot go below zero
-- [ ] The Egg Count is saved independently of the Closing and can be changed repeatedly during the day
-- [ ] Saving creates today's Day Entry with a Flock snapshot if it does not exist yet (reuse the Day Entry from 02 if it has landed)
-- [ ] Expected Eggs for today are shown, based on the hens in the Flock (not those counted at Closing)
-- [ ] Egg Rating is shown with the thresholds above; no rating when the Flock has zero hens
-- [ ] Tests with the fake clock show the same Egg Count rated differently in November and in May
-- [ ] Threshold edges (exactly 60% and 120%) are covered, via the UI or, if awkward, a direct test of the pure domain module
-- [ ] The Egg Count survives remounting `<App>` with the same storage (tested)
+- [x] Egg Count card shows large +/− buttons; the count cannot go below zero
+- [x] The Egg Count is saved independently of the Closing and can be changed repeatedly during the day
+- [x] Saving creates today's Day Entry with a Flock snapshot if it does not exist yet (reuse the Day Entry from 02 if it has landed)
+- [x] Expected Eggs for today are shown, based on the hens in the Flock (not those counted at Closing)
+- [x] Egg Rating is shown with the thresholds above; no rating when the Flock has zero hens
+- [x] Tests with the fake clock show the same Egg Count rated differently in November and in May
+- [x] Threshold edges (exactly 60% and 120%) are covered, via the UI or, if awkward, a direct test of the pure domain module
+- [x] The Egg Count survives remounting `<App>` with the same storage (tested)

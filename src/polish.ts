@@ -1,4 +1,15 @@
-import { fromDateKey, type DateKey, type Flock } from './domain';
+import { fromDateKey, type DateKey, type EggRating, type Flock } from './domain';
+
+/** E.g. "1,3"; whole numbers without a fraction. */
+export function formatDecimal(value: number): string {
+  return new Intl.NumberFormat('pl-PL', { maximumFractionDigits: 1 }).format(value);
+}
+
+export const EGG_RATING_LABELS: Record<EggRating, string> = {
+  poor: 'słabo',
+  normal: 'norma',
+  great: 'świetnie',
+};
 
 /** E.g. "niedziela, 3 maja 2026". */
 export function formatLongDate(key: DateKey): string {
