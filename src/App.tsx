@@ -6,6 +6,7 @@ import { BottomNav, type Tab } from './components/BottomNav';
 import { DayDetailScreen } from './screens/DayDetailScreen';
 import { FlockSetupScreen } from './screens/FlockSetupScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
+import { SettingsScreen } from './screens/SettingsScreen';
 import { TodayScreen } from './screens/TodayScreen';
 
 export type AppProps = {
@@ -33,26 +34,23 @@ export function App({ clock = systemClock, storage = defaultStorage }: AppProps)
     update({ ...state, flock });
   }
 
-  if (!state.flock) {
-    return <FlockSetupScreen onSave={saveFlock} />;
-  }
   function selectTab(next: Tab) {
     setTab(next);
     setOpenDay(undefined);
   }
 
-  const flock = state.flock;
+  if (!state.flock) {
+    return <FlockSetupScreen onSave={saveFlock} />;
+  }
   return (
-    <>
-      {tab === 'history' && openDay && (
-        <DayDetailScreen
-          key={openDay}
-          date={openDay}
-          flock={flock}
-          dayEntry={state.dayEntries[openDay]}
-          onSaveClosing={(closing) => update(saveClosing(state, openDay, closing))}
-          onEggCountChange={(eggCount) => update(saveEggCount(state, openDay, eggCount))}
-          onBack={() => setOpenDay(undefined)}
+    <div className="app-shell">
+      {tab === 'today' && (
+        <TodayScreen
+          today={today}
+          flock={state.flock}
+          dayEntry={state.dayEntries[today]}
+          onSaveClosing={(closing) => update(saveClosing(state, today, closing))}
+          onEggCountChange={(eggCount) => update(saveEggCount(state, today, eggCount))}
         />
       )}
       {tab === 'history' && !openDay && (
@@ -63,16 +61,19 @@ export function App({ clock = systemClock, storage = defaultStorage }: AppProps)
           onOpenDay={(date) => date <= today && setOpenDay(date)}
         />
       )}
-      {tab === 'today' && (
-        <TodayScreen
-          today={today}
-          flock={flock}
-          dayEntry={state.dayEntries[today]}
-          onSaveClosing={(closing) => update(saveClosing(state, today, closing))}
-          onEggCountChange={(eggCount) => update(saveEggCount(state, today, eggCount))}
+      {tab === 'history' && openDay && (
+        <DayDetailScreen
+          key={openDay}
+          date={openDay}
+          flock={state.flock}
+          dayEntry={state.dayEntries[openDay]}
+          onSaveClosing={(closing) => update(saveClosing(state, openDay, closing))}
+          onEggCountChange={(eggCount) => update(saveEggCount(state, openDay, eggCount))}
+          onBack={() => setOpenDay(undefined)}
         />
       )}
-      <BottomNav active={tab} onSelect={selectTab} />
-    </>
+      {tab === 'settings' && <SettingsScreen flock={state.flock} onSaveFlock={saveFlock} />}
+      <BottomNav current={tab} onSelect={selectTab} />
+    </div>
   );
 }

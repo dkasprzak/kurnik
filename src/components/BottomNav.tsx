@@ -1,17 +1,19 @@
-export type Tab = 'today' | 'history';
+export type Tab = 'today' | 'history' | 'settings';
 
-/** Tabs in the bottom navigation bar, in display order. */
-const TABS: readonly { id: Tab; label: string }[] = [
+/** Bottom-bar tabs, in display order. Add new screens here. */
+const TABS: { id: Tab; label: string }[] = [
   { id: 'today', label: 'Dziś' },
   { id: 'history', label: 'Historia' },
+  { id: 'settings', label: 'Ustawienia' },
 ];
 
 type Props = {
-  active: Tab;
+  current: Tab;
   onSelect: (tab: Tab) => void;
 };
 
-export function BottomNav({ active, onSelect }: Props) {
+/** Thumb-reachable tab bar fixed to the bottom of the screen. */
+export function BottomNav({ current, onSelect }: Props) {
   return (
     <nav className="bottom-nav" aria-label="Nawigacja">
       {TABS.map((tab) => (
@@ -19,7 +21,7 @@ export function BottomNav({ active, onSelect }: Props) {
           key={tab.id}
           type="button"
           className="bottom-nav-tab"
-          aria-current={tab.id === active ? 'page' : undefined}
+          aria-current={tab.id === current ? 'page' : undefined}
           onClick={() => onSelect(tab.id)}
         >
           {tab.label}
