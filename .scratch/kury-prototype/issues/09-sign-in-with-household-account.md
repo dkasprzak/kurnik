@@ -15,4 +15,4 @@ See `.scratch/kury-prototype/spec.md` (Amendment 1, stories 40–42) and `GLOSSA
 - [x] Session persists across remount (fake auth state survives; real adapter uses Firebase's local persistence)
 - [x] "Wyloguj" in Settings signs out and shows the sign-in screen
 - [x] The app still builds and runs when env variables are missing in tests (adapter is only created in the real entry point)
-- [ ] Manual check (after 08): sign in with the Household Account on a phone, close and reopen the app (still signed in), then "Wyloguj"
+- [x] Manual check (after 08): sign in with the Household Account on a phone, close and reopen the app (still signed in), then "Wyloguj"

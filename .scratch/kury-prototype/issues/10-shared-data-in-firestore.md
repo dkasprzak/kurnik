@@ -17,4 +17,4 @@ See `.scratch/kury-prototype/spec.md` (Amendment 1, stories 43–45) and `docs/a
 - [x] Firestore adapter: one Flock document and one document per Day Entry (keyed by date) under the account's uid; writes merge only the changed fields
 - [x] Firestore offline persistence enabled (persistent local cache)
 - [x] `firestore.rules` allows reads and writes only to the signed-in account's own documents; `firebase.json` references it
-- [ ] Manual check (after 08): two browsers signed in to the same account see each other's changes live
+- [x] Manual check (after 08): two browsers signed in to the same account see each other's changes live
