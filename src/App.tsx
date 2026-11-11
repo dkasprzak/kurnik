@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { systemClock, type Clock } from './clock';
 import { saveClosing, saveEggCount, toDateKey, type AppState, type Flock } from './domain';
 import { createLocalStorage, type AppStorage } from './storage';
+import { BottomNav, type Tab } from './components/BottomNav';
 import { FlockSetupScreen } from './screens/FlockSetupScreen';
+import { SettingsScreen } from './screens/SettingsScreen';
 import { TodayScreen } from './screens/TodayScreen';
 
 export type AppProps = {
@@ -16,6 +18,7 @@ const defaultStorage = createLocalStorage();
 
 export function App({ clock = systemClock, storage = defaultStorage }: AppProps) {
   const [state, setState] = useState<AppState>(() => storage.load());
+  const [tab, setTab] = useState<Tab>('today');
   const today = toDateKey(clock());
 
   function update(next: AppState) {
@@ -31,12 +34,18 @@ export function App({ clock = systemClock, storage = defaultStorage }: AppProps)
     return <FlockSetupScreen onSave={saveFlock} />;
   }
   return (
-    <TodayScreen
-      today={today}
-      flock={state.flock}
-      dayEntry={state.dayEntries[today]}
-      onSaveClosing={(closing) => update(saveClosing(state, today, closing))}
-      onEggCountChange={(eggCount) => update(saveEggCount(state, today, eggCount))}
-    />
+    <div className="app-shell">
+      {tab === 'today' && (
+        <TodayScreen
+          today={today}
+          flock={state.flock}
+          dayEntry={state.dayEntries[today]}
+          onSaveClosing={(closing) => update(saveClosing(state, today, closing))}
+          onEggCountChange={(eggCount) => update(saveEggCount(state, today, eggCount))}
+        />
+      )}
+      {tab === 'settings' && <SettingsScreen flock={state.flock} onSaveFlock={saveFlock} />}
+      <BottomNav current={tab} onSelect={setTab} />
+    </div>
   );
 }
