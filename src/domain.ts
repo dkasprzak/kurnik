@@ -128,3 +128,40 @@ export function saveEggCount(state: AppState, date: DateKey, eggCount: number): 
     dayEntries: { ...state.dayEntries, [date]: { ...entry, eggCount: Math.max(0, eggCount) } },
   };
 }
+
+/** The date `days` calendar days after `date` (negative goes back). */
+export function addDays(date: DateKey, days: number): DateKey {
+  const moment = fromDateKey(date);
+  moment.setDate(moment.getDate() + days);
+  return toDateKey(moment);
+}
+
+/** Totals over a window of recent days, for the History summary. */
+export type DaysSummary = {
+  totalEggs: number;
+  /** Total eggs ÷ days in the window that have an Egg Count; 0 when none do. */
+  averageEggs: number;
+  /** Days in the window whose Closing had a Shortfall. */
+  shortfallDays: number;
+};
+
+/** Summarises the `days` calendar days ending on `today`, inclusive. */
+export function summarizeDays(dayEntries: AppState['dayEntries'], today: DateKey, days: number): DaysSummary {
+  const first = addDays(today, -(days - 1));
+  let totalEggs = 0;
+  let daysWithEggCount = 0;
+  let shortfallDays = 0;
+  for (const [date, entry] of Object.entries(dayEntries)) {
+    if (date < first || date > today) continue;
+    if (entry.eggCount !== undefined) {
+      totalEggs += entry.eggCount;
+      daysWithEggCount += 1;
+    }
+    if (entry.closing && !isAllIn(shortfallOf(entry.flock, entry.closing))) shortfallDays += 1;
+  }
+  return {
+    totalEggs,
+    averageEggs: daysWithEggCount > 0 ? totalEggs / daysWithEggCount : 0,
+    shortfallDays,
+  };
+}

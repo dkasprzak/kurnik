@@ -72,6 +72,34 @@ h1 {
   font-weight: 600;
 }
 
+/* History summary */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.summary-card h2 {
+  font-weight: 600;
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 12px;
+  margin: 8px 0 0;
+}
+
+.summary-stats dt {
+  color: var(--muted);
+}
+
+.summary-stats dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+}
+
 .form {
   display: flex;
   flex-direction: column;

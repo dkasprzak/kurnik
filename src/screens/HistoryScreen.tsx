@@ -1,6 +1,39 @@
 import { useState } from 'react';
-import { isAllIn, rateEggCount, shortfallOf, type AppState, type DateKey, type DayEntry } from '../domain';
+import {
+  isAllIn,
+  rateEggCount,
+  shortfallOf,
+  summarizeDays,
+  type AppState,
+  type DateKey,
+  type DayEntry,
+  type DaysSummary,
+} from '../domain';
 import { EGG_RATING_LABELS, describeMissingHens, describeMissingRoosters, formatLongDate } from '../polish';
+
+/** Always one decimal, e.g. "2,0". */
+const formatAverage = (value: number) =>
+  new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(value);
+
+/** Total eggs, average per day and Shortfall day count for one window of recent days. */
+function SummaryCard({ title, summary }: { title: string; summary: DaysSummary }) {
+  const headingId = `summary-${title.replace(/\s+/g, '-')}`;
+  return (
+    <section className="card summary-card" aria-labelledby={headingId}>
+      <h2 id={headingId} className="card-label">
+        {title}
+      </h2>
+      <dl className="summary-stats">
+        <dt>Jajka razem</dt>
+        <dd>{summary.totalEggs}</dd>
+        <dt>Średnio dziennie</dt>
+        <dd>{formatAverage(summary.averageEggs)}</dd>
+        <dt>Dni z brakami</dt>
+        <dd>{summary.shortfallDays}</dd>
+      </dl>
+    </section>
+  );
+}
 
 type Props = {
   today: DateKey;
@@ -15,6 +48,10 @@ export function HistoryScreen({ today, dayEntries, onOpenDay }: Props) {
       <header className="screen-header">
         <h1>Historia</h1>
       </header>
+      <div className="summary">
+        <SummaryCard title="Ostatnie 7 dni" summary={summarizeDays(dayEntries, today, 7)} />
+        <SummaryCard title="Ostatnie 30 dni" summary={summarizeDays(dayEntries, today, 30)} />
+      </div>
       <DayPicker today={today} onOpenDay={onOpenDay} />
       <ul className="day-list" aria-label="Dni">
         {dates.map((date) => (

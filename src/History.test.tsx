@@ -137,3 +137,54 @@ describe('History', () => {
     expect(screen.getByRole('button', { name: 'Otwórz dzień' })).toBeEnabled();
   });
 });
+
+describe('History summary', () => {
+  /** The value shown next to a labelled statistic in a summary window. */
+  const stat = (windowName: string, label: string) =>
+    within(screen.getByRole('region', { name: windowName })).getByText(label).nextElementSibling;
+
+  it('totals eggs, averages over days with an Egg Count and counts Shortfall days for 7 and 30 days', async () => {
+    const flock = { hens: 5, roosters: 1 };
+    const storage = seededStorage({
+      // inside the last 7 days (2026-11-05 … 2026-11-11)
+      '2026-11-11': { flock, eggCount: 2 },
+      '2026-11-10': { flock, eggCount: 1, closing: { hens: 4, roosters: 1 } },
+      '2026-11-09': { flock, closing: { hens: 5, roosters: 0 } },
+      '2026-11-05': { flock, eggCount: 4, closing: { hens: 5, roosters: 1 } },
+      // inside the last 30 days only (2026-10-13 … 2026-11-04)
+      '2026-11-04': { flock, eggCount: 3, closing: { hens: 3, roosters: 1 } },
+      '2026-10-13': { flock, eggCount: 5 },
+      // outside both windows
+      '2026-10-12': { flock, eggCount: 9, closing: { hens: 0, roosters: 0 } },
+    });
+    const { user } = renderApp({ today: '2026-11-11', storage });
+
+    await openHistory(user);
+
+    // 7 days: 2 + 1 + 4 = 7 eggs over 3 days with an Egg Count → 2,3; Shortfall on the 10th and 9th
+    expect(stat('Ostatnie 7 dni', 'Jajka razem')).toHaveTextContent(/^7$/);
+    expect(stat('Ostatnie 7 dni', 'Średnio dziennie')).toHaveTextContent(/^2,3$/);
+    expect(stat('Ostatnie 7 dni', 'Dni z brakami')).toHaveTextContent(/^2$/);
+
+    // 30 days: 7 + 3 + 5 = 15 eggs over 5 days → 3,0; Shortfall on the 10th, 9th and 4th
+    expect(stat('Ostatnie 30 dni', 'Jajka razem')).toHaveTextContent(/^15$/);
+    expect(stat('Ostatnie 30 dni', 'Średnio dziennie')).toHaveTextContent(/^3,0$/);
+    expect(stat('Ostatnie 30 dni', 'Dni z brakami')).toHaveTextContent(/^3$/);
+  });
+
+  it('shows zeros, not NaN, when no day in the window has data', async () => {
+    const storage = seededStorage({
+      '2026-11-10': { flock: { hens: 5, roosters: 1 } },
+      '2026-09-01': { flock: { hens: 5, roosters: 1 }, eggCount: 4 },
+    });
+    const { user } = renderApp({ today: '2026-11-11', storage });
+
+    await openHistory(user);
+
+    for (const windowName of ['Ostatnie 7 dni', 'Ostatnie 30 dni']) {
+      expect(stat(windowName, 'Jajka razem')).toHaveTextContent(/^0$/);
+      expect(stat(windowName, 'Średnio dziennie')).toHaveTextContent(/^0,0$/);
+      expect(stat(windowName, 'Dni z brakami')).toHaveTextContent(/^0$/);
+    }
+  });
+});
