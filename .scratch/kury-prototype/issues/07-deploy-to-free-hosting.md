@@ -6,7 +6,7 @@ Note: data lives in localStorage per origin, so entries made against the local d
 
 **Blocked by:** 01, 02, 03, 04, 05, 06
 
-**Status:** ready-for-human
+**Status:** wontfix (superseded by 08 and 11: Firebase Hosting)
 
 - [ ] Production build succeeds and the app is deployed to the chosen host
 - [ ] The public URL opens on the phone and the app can be added to the home screen via the manifest
