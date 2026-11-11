@@ -117,3 +117,42 @@ A History screen lists past Day Entries with a 7-day and 30-day summary, and any
 - Data lives only in this browser's localStorage: clearing browser data wipes it, and entries made against the local dev server will not appear in the hosted version (different origin). Acceptable for a prototype.
 - Vocabulary follows `GLOSSARY.md` (Flock, Hen, Rooster, Day Entry, Closing, Shortfall, Egg Count, Laying Rate, Expected Eggs, Egg Rating).
 - The Laying Rate table is a rough estimate for a mixed-age backyard flock in Poland without supplemental lighting; it is expected to be tuned after real use.
+
+---
+
+## Amendment 1 (2026-11-11): shared Household Account on Firebase
+
+Supersedes the "single keeper, single device, localStorage" decisions above. See `docs/adr/0001-firebase-for-shared-household-data.md`.
+
+### Problem
+
+The app is for the keeper's parents: two Keepers on two phones who must see and edit the same Flock and Day Entries.
+
+### User stories
+
+40. As a Keeper, I want to sign in with the shared Household Account email and password, so that I see my household's data.
+41. As a Keeper, I want to stay signed in after closing the app, so that I don't type the password every evening.
+42. As a Keeper, I want to sign out from Settings, so that I can hand over or reset the phone.
+43. As a Keeper, I want an entry made by the other Keeper to appear on my phone without refreshing, so that we both know whether the coop is closed.
+44. As a Keeper, I want my Egg Count and the other Keeper's Closing for the same day to both be kept, so that we never overwrite each other's work.
+45. As a Keeper, I want to record entries without signal at the coop, so that they sync when the phone reconnects.
+46. As a Keeper, I want to open the app from a public address on my home screen, so that I can use it anywhere.
+
+### Implementation decisions
+
+- Firebase Authentication (email/password) with one Household Account created by hand in the console; the app has a sign-in screen only (no sign-up, no password reset). Session persists on the device; "Wyloguj" in Settings.
+- Firestore in `europe-central2`, offline persistence enabled. Data lives under the signed-in account's uid: one Flock document and one document per Day Entry keyed by date. Writes touch only the changed fields (Egg Count, Closing, Flock snapshot); same-field conflicts resolve last-write-wins. Realtime listeners keep the screens up to date.
+- Security rules: only the signed-in account may read and write its own documents.
+- The storage seam changes from load/save of the whole state to subscribe + granular writes; the in-memory implementation keeps backing the tests. An auth seam (signed-in state, sign in, sign out) is injected the same way, with a fake in tests.
+- Firebase web config comes from Vite env variables (`.env.local`, not committed).
+- Existing localStorage data is not migrated.
+- Hosting on Firebase Hosting (`firebase deploy`), replacing ticket 07.
+
+### Testing
+
+- Still one seam: `<App>` with injected clock, in-memory storage and fake auth. Tests cover the sign-in gate, sign-out, and that an external change to storage (simulating the other Keeper) appears on screen.
+- The Firestore and Firebase Auth adapters are verified manually on the phones; no emulator.
+
+### Out of scope
+
+Separate accounts per Keeper, sign-up, password reset in-app, per-Keeper attribution of entries, migrating localStorage data, Firebase emulator tests.

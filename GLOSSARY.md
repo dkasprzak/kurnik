@@ -2,6 +2,16 @@
 
 An app for a backyard chicken keeper to record the evening closing of the coop and the daily egg count, and to judge whether the egg count is reasonable for the flock size and season.
 
+## People
+
+**Keeper**:
+A person who looks after the Flock and records Closings and Egg Counts. A household may have several Keepers.
+_Avoid_: User, owner, farmer
+
+**Household Account**:
+The single sign-in shared by all Keepers of one Flock; the Flock and every Day Entry belong to it, so all Keepers see and edit the same data.
+_Avoid_: User account, profile
+
 ## Flock
 
 **Flock**:
@@ -19,7 +29,7 @@ _Avoid_: Cock, cockerel
 ## Daily record
 
 **Day Entry**:
-The single record for one calendar day, holding that day's Closing and Egg Count, plus the Flock as it was on that day. Either part may be filled in independently and edited later, including for past days.
+The single record for one calendar day, holding that day's Closing and Egg Count, plus the Flock as it was on that day (a Flock change updates today's Day Entry but never earlier ones). Either part may be filled in independently and edited later, including for past days.
 _Avoid_: Log, report
 
 **Closing**:
