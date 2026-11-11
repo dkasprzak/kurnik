@@ -120,7 +120,7 @@ describe('Settings', () => {
     expect(closingCard().getByRole('alert')).not.toHaveTextContent('Brakuje 4 kur');
   });
 
-  it("keeps today's existing Day Entry snapshot and uses the new Flock on a fresh day", async () => {
+  it("updates today's Day Entry snapshot and uses the new Flock on a fresh day", async () => {
     const storage = storageWithFlock({ hens: 5, roosters: 1 });
     const { user, unmount } = renderWith(storage, '2026-11-11');
 
@@ -128,7 +128,8 @@ describe('Settings', () => {
     await openSettings(user);
     await changeFlock(user, { hens: 6, roosters: 1 });
     await openToday(user);
-    expect(closingCard().getByText('Wszystkie ptaki w kurniku')).toBeInTheDocument();
+    // Today's Closing of 5 hens is now compared against the new 6-hen Flock.
+    expect(closingCard().getByRole('alert')).toHaveTextContent('Brakuje 1 kury');
     unmount();
 
     renderWith(storage, '2026-11-12');

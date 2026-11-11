@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { systemClock, type Clock } from './clock';
-import { saveClosing, saveEggCount, toDateKey, type AppState, type DateKey, type Flock } from './domain';
+import { changeFlock, saveClosing, saveEggCount, toDateKey, type AppState, type DateKey, type Flock } from './domain';
 import { createLocalStorage, type AppStorage } from './storage';
 import { BottomNav, type Tab } from './components/BottomNav';
 import { DayDetailScreen } from './screens/DayDetailScreen';
@@ -31,7 +31,7 @@ export function App({ clock = systemClock, storage = defaultStorage }: AppProps)
   }
 
   function saveFlock(flock: Flock) {
-    update({ ...state, flock });
+    update(changeFlock(state, today, flock));
   }
 
   function selectTab(next: Tab) {

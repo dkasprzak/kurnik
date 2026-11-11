@@ -54,6 +54,20 @@ export function validateFlock(flock: Flock): FlockError | undefined {
 export const emptyAppState = (): AppState => ({ dayEntries: {} });
 
 /**
+ * Replaces the Flock. Today's Day Entry (if any) takes the new Flock as its
+ * snapshot; past Day Entries keep theirs.
+ */
+export function changeFlock(state: AppState, today: DateKey, flock: Flock): AppState {
+  const todayEntry = state.dayEntries[today];
+  if (!todayEntry) return { ...state, flock };
+  return {
+    ...state,
+    flock,
+    dayEntries: { ...state.dayEntries, [today]: { ...todayEntry, flock: { ...flock } } },
+  };
+}
+
+/**
  * The Day Entry for a date, or a new one with a snapshot of the current Flock
  * if none exists yet. Requires the Flock to be set up.
  */
