@@ -32,3 +32,18 @@ export function countOf(count: number, forms: PluralForms): string {
 export function describeFlock(flock: Flock): string {
   return `${countOf(flock.hens, HEN_FORMS)}, ${countOf(flock.roosters, ROOSTER_FORMS)}`;
 }
+
+/** Genitive forms used after "brakuje": [one, few (2–4), many]. */
+const MISSING_HEN_FORMS: PluralForms = ['kury', 'kur', 'kur'];
+const MISSING_ROOSTER_FORMS: PluralForms = ['koguta', 'kogutów', 'kogutów'];
+
+/** Shortfall of hens, e.g. "Brakuje 1 kury", "Brakuje 5 kur". */
+export function describeMissingHens(count: number): string {
+  return `Brakuje ${count} ${pluralize(count, MISSING_HEN_FORMS)}`;
+}
+
+/** Shortfall of roosters, e.g. "Brakuje koguta", "Brakuje 2 kogutów". */
+export function describeMissingRoosters(count: number): string {
+  if (count === 1) return 'Brakuje koguta';
+  return `Brakuje ${count} ${pluralize(count, MISSING_ROOSTER_FORMS)}`;
+}

@@ -52,3 +52,42 @@ export function validateFlock(flock: Flock): FlockError | undefined {
 }
 
 export const emptyAppState = (): AppState => ({ dayEntries: {} });
+
+/**
+ * The Day Entry for a date, or a new one holding a snapshot of the current Flock.
+ * A new entry is not stored until the caller saves a state containing it.
+ */
+export function getOrCreateDayEntry(state: AppState, date: DateKey): DayEntry {
+  const existing = state.dayEntries[date];
+  if (existing) return existing;
+  if (!state.flock) throw new Error('Cannot create a Day Entry before the Flock is set up');
+  return { flock: { ...state.flock } };
+}
+
+/** Saves (or replaces) the Closing of a day, creating its Day Entry if needed. Never changes the Flock. */
+export function saveClosing(state: AppState, date: DateKey, closing: Closing): AppState {
+  const entry = getOrCreateDayEntry(state, date);
+  return {
+    ...state,
+    dayEntries: { ...state.dayEntries, [date]: { ...entry, closing: { ...closing } } },
+  };
+}
+
+/** Birds missing at Closing, per bird type. */
+export type Shortfall = {
+  hens: number;
+  roosters: number;
+};
+
+/** max(0, flock − counted) per bird type. */
+export function shortfallOf(flock: Flock, closing: Closing): Shortfall {
+  return {
+    hens: Math.max(0, flock.hens - closing.hens),
+    roosters: Math.max(0, flock.roosters - closing.roosters),
+  };
+}
+
+/** True when no bird is missing ("all in"). */
+export function isAllIn(shortfall: Shortfall): boolean {
+  return shortfall.hens === 0 && shortfall.roosters === 0;
+}

@@ -115,3 +115,90 @@ h1 {
 .button-primary:active {
   filter: brightness(0.9);
 }
+
+.button-secondary {
+  min-height: 48px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.card-title {
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+}
+
+/* Closing card */
+.closing-form,
+.closing-result {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.stepper-label {
+  font-weight: 600;
+}
+
+.stepper-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stepper-button {
+  width: var(--tap);
+  height: var(--tap);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.stepper-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.stepper-value {
+  min-width: 2.5ch;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.closing-all-in {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+.closing-shortfall {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fde8e6;
+  border: 2px solid var(--danger);
+  color: var(--danger);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.closing-shortfall p {
+  margin: 0;
+}
