@@ -7,13 +7,15 @@ type Props = {
   flock: Flock;
   eggCount: number;
   onChange: (eggCount: number) => void;
+  /** Visible card label; "Jajka dziś" on the Today screen. */
+  label?: string;
 };
 
-export function EggCountCard({ date, flock, eggCount, onChange }: Props) {
+export function EggCountCard({ date, flock, eggCount, onChange, label = 'Jajka dziś' }: Props) {
   const rating = rateEggCount(eggCount, flock, date);
   return (
     <section className="card" aria-label="Jajka">
-      <p className="card-label">Jajka dziś</p>
+      <p className="card-label">{label}</p>
       <div className="egg-stepper">
         <button
           type="button"

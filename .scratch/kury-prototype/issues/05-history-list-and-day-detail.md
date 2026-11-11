@@ -6,12 +6,12 @@ See `.scratch/kury-prototype/spec.md` (stories 27–28, 30–34) and `GLOSSARY.m
 
 **Blocked by:** 02 (Closing on the Today screen), 03 (Egg Count with Egg Rating on the Today screen). Ticket 04's navigation bar is nice to have; if 04 has not landed, create the bar here.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] History tab in the bottom navigation lists Day Entries newest first; days with no entry are not listed
-- [ ] Each row shows the date, Egg Count with Egg Rating, and Closing status
-- [ ] Tapping a row opens the day detail with Closing and Egg Count cards for that date, reusing the Today cards
-- [ ] Changes made in the day detail are saved to that day's Day Entry and reflected in the list
-- [ ] A past day without an entry can be opened (e.g. via a date picker limited to today and earlier) and backfilled; its Flock snapshot is the current Flock
-- [ ] Future dates cannot be selected
-- [ ] Test: a past day in a different month is rated using that month's Laying Rate and its own Flock snapshot
+- [x] History tab in the bottom navigation lists Day Entries newest first; days with no entry are not listed
+- [x] Each row shows the date, Egg Count with Egg Rating, and Closing status
+- [x] Tapping a row opens the day detail with Closing and Egg Count cards for that date, reusing the Today cards
+- [x] Changes made in the day detail are saved to that day's Day Entry and reflected in the list
+- [x] A past day without an entry can be opened (e.g. via a date picker limited to today and earlier) and backfilled; its Flock snapshot is the current Flock
+- [x] Future dates cannot be selected
+- [x] Test: a past day in a different month is rated using that month's Laying Rate and its own Flock snapshot
